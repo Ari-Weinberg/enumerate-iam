@@ -299,22 +299,25 @@ def enumerate_role(iam_client, output):
         # unable to get that piece of information just return
         return
 
+    user_or_role_name = user_or_role_arn.split('/')[-1]
+
     # Attempt to get role to start.
     try:
-        role = iam_client.get_role(RoleName=user_or_role_arn)
+        role = iam_client.get_role(RoleName=user_or_role_name)
     except botocore.exceptions.ClientError as err:
-        arn, arn_id, arn_path = report_arn(str(err))
+        # arn, arn_id, arn_path = report_arn(str(err))
 
-        if arn is not None:
-            output["arn"] = arn
-            output["arn_id"] = arn_id
-            output["arn_path"] = arn_path
+        # if arn is not None:
+        #     output["arn"] = arn
+        #     output["arn_id"] = arn_id
+        #     output["arn_path"] = arn_path
 
         if "role" not in user_or_role_arn:
             # We did out best, but we got nothing from iam
             return
         else:
-            role_name = user_or_role_arn
+            role = {'Role': {'RoleName': user_or_role_name}} 
+            role_name = user_or_role_name
 
     else:
         output["iam.get_role"] = remove_metadata(role)
